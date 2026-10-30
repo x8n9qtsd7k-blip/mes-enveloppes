@@ -1,1 +1,41 @@
+name: Construire le logiciel Windows
 
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "mes-enveloppes/web/**"
+      - "mes-enveloppes/src-tauri/**"
+      - "mes-enveloppes/app-icon.png"
+      - "mes-enveloppes/package.json"
+      - ".github/workflows/main.yml"
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: mes-enveloppes
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: mes-enveloppes/src-tauri
+      - name: Installer Tauri
+        run: npm install
+      - name: Créer les icônes
+        run: npx tauri icon app-icon.png
+      - name: Construire l'installateur
+        run: npx tauri build
+      - name: Mettre l'installateur à disposition
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mes-Enveloppes-Windows
+          path: |
+            mes-enveloppes/src-tauri/target/release/bundle/nsis/*.exe
+            mes-enveloppes/src-tauri/target/release/bundle/msi/*.msi
