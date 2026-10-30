@@ -1,0 +1,19 @@
+[package]
+name = "mes-enveloppes"
+version = "1.0.0"
+description = "Mes Enveloppes"
+edition = "2021"
+
+[lib]
+name = "mes_enveloppes_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+
+[profile.release]
+strip = true
+lto = true
